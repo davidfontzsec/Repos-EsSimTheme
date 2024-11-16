@@ -1,90 +1,32 @@
-function getFirstImage(e, t) {
-    var a = $("<div>").html(e).find("img:first").attr("src");
-    
-    // Se for uma URL do ImgBB, retorna a URL original
-    if (a && a.includes('i.ibb.co')) {
-        return a;
-    }
-    
-    // Para outras imagens, mantém o processamento básico sem proxy
-    var o = a.lastIndexOf("/") || 0,
-        r = a.lastIndexOf("/", o - 1) || 0,
-        i = a.substring(0, r),
-        s = a.substring(r, o),
-        n = a.substring(o);
-    
-    if (s.match(/\/s[0-9]+/g) || s.match(/\/w[0-9]+/g)) {
-        s = "/w72-h72";
-    }
-    
-    return i + s + n;
+function getFirstImage(e,t){
+    var a=$("<div>").html(e).find("img:first").attr("src");
+    return a;
 }
 
-function getPostImage(e, t, a, o) {
-    var r = null != e[t].content ? e[t].content.$t : "";
-    a = e[t].media$thumbnail ? e[t].media$thumbnail.url : "https://i.ibb.co/dp15JzT/ESAvatar.webp";
-    
-    // Se encontrar uma imagem do ImgBB no conteúdo, usa ela diretamente
-    var imgbbMatch = r.match(/https?:\/\/i\.ibb\.co\/[a-zA-Z0-9]+\/[^"'\s]+/);
-    if (imgbbMatch) {
-        return imgbbMatch[0];
-    }
-    
-    // Verifica se é um vídeo do YouTube
-    if (r.indexOf(r.match(/<iframe(?:.+)?src=(?:.+)?(?:www.youtube.com)/g)) > -1) {
-        if (r.indexOf("<img") > -1) {
-            if (r.indexOf(r.match(/<iframe(?:.+)?src=(?:.+)?(?:www.youtube.com)/g)) < r.indexOf("<img")) {
-                return a.replace("img.youtube.com", "i.ytimg.com").replace("/default.", "/maxresdefault.");
-            } else {
-                return getFirstImage(r);
-            }
-        } else {
-            return a.replace("img.youtube.com", "i.ytimg.com").replace("/default.", "/maxresdefault.");
-        }
-    }
-    
-    // Para posts com imagens
-    return r.indexOf("<img") > -1 ? getFirstImage(r) : "https://i.ibb.co/dp15JzT/ESAvatar.webp";
+function getPostImage(e,t,a,o){
+    var r=null!=e[t].content?e[t].content.$t:"";
+    return a=e[t].media$thumbnail?e[t].media$thumbnail.url:"https://resources.blogblog.com/img/blank.gif",
+    r.indexOf(r.match(/<iframe(?:.+)?src=(?:.+)?(?:www.youtube.com)/g))>-1?
+        r.indexOf("<img")>-1?
+            r.indexOf(r.match(/<iframe(?:.+)?src=(?:.+)?(?:www.youtube.com)/g))<r.indexOf("<img")?
+                a.replace("img.youtube.com","i.ytimg.com").replace("/default.","/maxresdefault."):
+                getFirstImage(r):
+            a.replace("img.youtube.com","i.ytimg.com").replace("/default.","/maxresdefault."):
+        r.indexOf("<img")>-1?
+            getFirstImage(r):
+            "https://resources.blogblog.com/img/blank.gif";
 }
 
-function beautiAvatar(e) {
-    $(e).attr("src", function(e, t) {
-        // Substitui avatares padrão pelo avatar ImgBB
-        t = t.replace("//resources.blogblog.com/img/blank.gif", "//i.ibb.co/dp15JzT/ESAvatar.webp");
-        t = t.replace("//lh3.googleusercontent.com/zFdxGE77vvD2w5xHy6jkVuElKv-U9_9qLkRYK8OnbDeJPtjSZ82UPq5w6hJ-SA=s35", "//i.ibb.co/dp15JzT/ESAvatar.webp");
-        
-        // Se já for uma URL do ImgBB, mantém como está
-        if (t.includes('i.ibb.co')) {
-            return t;
-        }
-        
-        // Para outros casos, aplica o redimensionamento padrão
-        return t.replace("/s35", "/s39");
+function beautiAvatar(e){
+    $(e).attr("src", function(e,t){
+        return t;
     });
 }
 
-// Função adicional para garantir que as URLs do ImgBB não sejam convertidas
-function preventProxyConversion() {
-    // Remove atributos data-srcset que possam causar conversão para proxy
-    $('img[data-srcset]').removeAttr('data-srcset');
-    
-    // Remove classes que possam trigger lazy loading com proxy
-    $('img.lazy-img').removeClass('lazy-img');
-    
-    // Força URLs diretas do ImgBB
-    $('img').each(function() {
-        var src = $(this).attr('src');
-        if (src && src.includes('googleusercontent.com/blogger_img_proxy')) {
-            // Extrai a URL original se estiver codificada no proxy
-            var originalUrl = decodeURIComponent(src.split('=')[1]);
-            if (originalUrl.includes('i.ibb.co')) {
-                $(this).attr('src', originalUrl);
-            }
-        }
-    });
-}
+// Rest of the code remains unchanged
+function getPostImageType(e,t){return e.match("i.ytimg.com")?"is-video":"is-image"}
+function getPostSummary(e,t,a,o,r,i){return e[t].content?'<span class="entry-excerpt excerpt">'+$("<div>").html(e[t].content.$t).text().trim().substr(0,a)+"…</span>":""}
+function getPostComments(e,t,a,o){var r=e[t].author[0].name.$t,i=e[t].author[0].gd$image.src,s=e[t].title.$t;return'<div class="cmm1-item item-'+t+'"><a class="entry-inner wrap-all-link" href="'+a+'" title="'+r+'"><span class="entry-image-wrap cmm-avatar"><span class="entry-thumb" data-image="'+i+'"></span></span><div class="entry-header"><h2 class="entry-title cmm-title">'+r+'</h2><p class="cmm-snippet excerpt">'+s+"</p></div></a></div>"}
 
-// Adiciona a chamada da função quando o documento estiver pronto
-$(document).ready(function() {
-    preventProxyConversion();
-});
+// All the remaining functions unchanged...
+function getAjax(e,t,a,o,r){switch("related"==t&&(a=parseInt(a)+1),t){case"msimple":case"ticker":case"featured":case"block":case"grid":case"video":case"list":case"default":case"mini":case"comments":case"related":0==o&&(o="geterror404");var i=getFeedUrl(t,a,o);$.ajax({url:i,type:"GET",dataType:"json",cache:!0,beforeSend:function(a){switch(t){case"ticker":case"featured":case"block":case"grid":case"video":case"list":case"default":case"mini":case"comments":case"related":e.html(beforeLoader()).parent().addClass("type-"+t)}},success:function(a){var r="",i=-1,s=a.feed.entry;if("related"==t&&null!=s)for(var n=0,l=s;n<l.length;n++)clink==l[n].link.slice(-1)[0].href&&(i=n);switch(t){case"msimple":r='<div class="ul mega-items">';break;case"ticker":r='<div class="ticker-items">';break;case"featured":r='<div class="featured-items">';break;case"block":case"grid":case"list":case"video":r='<div class="content-block '+t+'-items">';break;case"default":r='<div class="default-items">';break;case"mini":r='<div class="mini-items">';break;case"comments":r='<div class="cmm1-items">';break;case"related":r='<div class="related-posts">'}var c=a.feed.entry;if(null!=c){var d=0;for(l=c;d<l.length;d++){l.length;s=getPostLink(l,d),n=getPostTitle(l,d);var m=getPostTag(l,d),h=getPostAuthor(l,d),f=getPostDate(l,d,m),p=getPostImage(l,d),u=getPostImageType(p,d),g=getPostMeta(h,f,l,d,t),v="";switch(t){case"msimple":v+='<div class="mega-item post"><a title="'+n+'" class="entry-image-wrap  '+u+'" href="'+s+'"><svg class="entry-thumb" viewBox="0 0 16 9" data-image="'+p+'"/></a><h2 class="entry-title"><a href="'+s+'" title="'+n+'">'+n+"</a></h2>"+g[1]+"</div>";break;case"ticker":v+='<div class="ticker-item item-'+d+'"><h2 class="entry-title"><a href="'+s+'" title="'+n+'">'+n+"</a></h2></div>";break;case"featured":v+='<div class="featured-item cs item-'+d+'"><a class="featured-inner" href="'+s+'" title="'+n+'"><span class="entry-image-wrap before-mask '+u+'"><span class="entry-thumb" data-image="'+p+'"></span></span><div class="entry-header entry-info">'+m+'<h2 class="entry-title">'+n+"</h2>"+g[0]+"</div></a></div>";break;case"block":switch(d){case 1:v+='<div class="block-item item-'+d+'"><a title="'+n+'" class="entry-image-wrap  '+u+'" href="'+s+'"><svg class="entry-thumb" viewBox="0 0 16 9" data-image="'+p+'"/></a><div class="entry-header">'+g[1]+'<h2 class="entry-title"><a href="'+s+'" title="'+n+'">'+n+"</a></h2>"+getPostSummary(l,d,160)+"</div></div>";break;default:v+='<div class="block-item item-'+d+'"><a title="'+n+'" class="entry-image-wrap  '+u+'" href="'+s+'"><svg class="entry-thumb" viewBox="0 0 16 9" data-image="'+p+'"/></a><div class="entry-header">'+g[1]+'<h2 class="entry-title"><a href="'+s+'" title="'+n+'">'+n+"</a></h2></div></div>"}break;case"grid":v+='<div class="grid-item item-'+d+'"><a title="'+n+'" class="entry-image-wrap  '+u+'" href="'+s+'"><svg class="entry-thumb" viewBox="0 0 16 9" data-image="'+p+'"/></a><div class="entry-header"><h2 class="entry-title"><a title="'+n+'" href="'+s+'">'+n+"</a></h2>"+g[1]+"</div></div>";break;case"list":v+='<div class="list-item item-'+d+'"><a title="'+n+'" class="entry-image-wrap  '+u+'" href="'+s+'"><svg class="entry-thumb" viewBox="0 0 16 9" data-image="'+p+'"/></a><div class="entry-header"><h2 class="entry-title"><a title="'+n+'" href="'+s+'">'+n+"</a></h2>"+getPostSummary(l,d,120)+g[0]+"</div></div>";break;case"video":v+='<div class="video-item item-'+d+'"><a title="'+n+'" class="entry-image-wrap  is-video" href="'+s+'"><svg class="entry-thumb" viewBox="0 0 16 9" data-image="'+p+'"/></a><div class="entry-header"><h2 class="entry-title"><a title="'+n+'" href="'+s+'">'+n+"</a></h2>"+g[1]+"</div></div>";break;case"default":v+='<div class="default-item ds item-'+d+'"><a title="'+n+'" class="entry-image-wrap  '+u+'" href="'+s+'"><svg class="entry-thumb" viewBox="0 0 16 9" data-image="'+p+'"/></a><div class="entry-header"><h2 class="entry-title"><a href="'+s+'" title="'+n+'">'+n+"</a></h2>"+g[1]+"</div></div>";break;case"mini":v+='<div class="mini-item item-'+d+'"><a title="'+n+'" class="entry-image-wrap  '+u+'" href="'+s+'"><svg class="entry-thumb" viewBox="0 0 16 9" data-image="'+p+'"/></a><div class="entry-header"><h2 class="entry-title"><a href="'+s+'" title="'+n+'">'+n+"</a></h2>"+g[1]+"</div></div>";break;case"comments":v+=getPostComments(l,d,s);break;case"related":if(l.length>1&&(d==i||i<0&&d==l.length-1))continue;v+='<div class="related-item item-'+d+'"><a title="'+n+'" class="entry-image-wrap  '+u+'" href="'+s+'"><svg class="entry-thumb" width="100" height="62.5" viewBox="0 0 16 9" width="" data-image="'+p+'"/></a><div class="entry-header"><h2 class="entry-title"><a href="'+s+'" title="'+n+'">'+n+"</a></h2>"+g[1]+"</div></div>"}r+=v}}else switch(t){case"msimple":r='<div class="ul mega-items no-items">'+msgError()+"</div>";break;default:r=msgError()}switch(t){case"msimple":r+="</div>",e.append(r).addClass("msimple"),e.find("a:first").attr("href",function(e,t){switch(o){case"recent":t=t.replace(t,"/search");break;default:t=t.replace(t,"/search/label/"+o)}return t});break;case"ticker":r+="</div>",e.html(r).tickerify();break;default:r+="</div>",e.html(r)}e.find("span.entry-thumb,svg.entry-thumb").lazyify()},error:function(){switch(t){case"msimple":e.append('<div class="ul mega-items no-items">'+msgError()+"</div>");break;default:e.html(msgError())}}})}}
